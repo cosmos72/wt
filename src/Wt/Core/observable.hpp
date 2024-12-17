@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <functional>
+#include <mutex>
 
 namespace Wt { 
 
@@ -133,6 +134,7 @@ public:
 
 private:
   std::unique_ptr<Impl::observer_info> observerInfo_;
+  std::mutex observerInfoMutex_;
 
   void addObserver(Impl::observing_ptr_base *observer) noexcept;
   void removeObserver(Impl::observing_ptr_base *observer) noexcept;
