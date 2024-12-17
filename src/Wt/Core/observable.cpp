@@ -8,6 +8,7 @@
 #include "observing_ptr.hpp"
 
 #include <algorithm>
+#include <set>
 
 namespace Wt { namespace Core {
 
@@ -17,26 +18,19 @@ struct observer_info
 {
   void addObserver(observing_ptr_base *ptr) noexcept
   {
-    observers_.push_back(ptr);
+    observers_.insert(ptr);
   }
 
   void removeObserver(observing_ptr_base *ptr) noexcept
   {
-    auto i = std::find(observers_.begin(), observers_.end(), ptr);
-
-    if (i != observers_.end())
-      observers_.erase(i);
+    observers_.erase(ptr);
   }
 
   void replaceObserver(observing_ptr_base *original,
                        observing_ptr_base *observer) noexcept
   {
-    auto i = std::find(observers_.begin(), observers_.end(), original);
-
-    if (i != observers_.end())
-      *i = observer;
-    else
-      observers_.push_back(observer);
+    observers_.erase(original);
+    observers_.insert(observer);
   }
 
   ~observer_info() {
@@ -45,7 +39,7 @@ struct observer_info
   }
 
 private:
-  std::vector<observing_ptr_base *> observers_;
+  std::set<observing_ptr_base *> observers_;
 };
 
 }
