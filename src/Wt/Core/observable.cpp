@@ -54,10 +54,17 @@ observable::observable() noexcept
 { }
 
 observable::~observable()
-{ }
+{
+  std::lock_guard<std::mutex> l(observerInfoMutex_);
+
+  // destroy observerInfo_ while holding a lock
+  observerInfo_.reset();
+}
 
 void observable::addObserver(Impl::observing_ptr_base *observer) noexcept
 {
+  std::lock_guard<std::mutex> l(observerInfoMutex_);
+
   if (!observerInfo_)
     observerInfo_.reset(new Impl::observer_info());
 
@@ -66,6 +73,8 @@ void observable::addObserver(Impl::observing_ptr_base *observer) noexcept
 
 void observable::removeObserver(Impl::observing_ptr_base *observer) noexcept
 {
+  std::lock_guard<std::mutex> l(observerInfoMutex_);
+
   if (observerInfo_)
     observerInfo_->removeObserver(observer);
 }
@@ -73,6 +82,8 @@ void observable::removeObserver(Impl::observing_ptr_base *observer) noexcept
 void observable::replaceObserver(Impl::observing_ptr_base *original,
                                  Impl::observing_ptr_base *observer) noexcept
 {
+  std::lock_guard<std::mutex> l(observerInfoMutex_);
+
   if (!observerInfo_)
     observerInfo_.reset(new Impl::observer_info());
 
